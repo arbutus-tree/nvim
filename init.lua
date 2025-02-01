@@ -28,6 +28,8 @@ vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 
 -- TODO make the timeout faster
+-- TODO make actual chord if possible??
+-- (problem: typing something ending with h or j and then escaping kills that h or j)
 vim.keymap.set('i', 'hj', '<esc>', { desc = 'hj chord escape' })
 vim.keymap.set('i', 'jh', '<esc>', { desc = 'jh chord escape' })
 
@@ -53,7 +55,7 @@ end
 
 vim.keymap.set('n', '<leader>hc', ':lua ShowHelpUnderCursor()<cr>', { desc = 'Shows help for the term under cursor'})
 
-
+vim.keymap.set('n', '<leader>=', "`[v`]=", { desc = 'Fix indent of pasted code'})
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -78,25 +80,31 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+-- plugin specs
+
+local nvim_tree_spec = { -- file tree
+  "nvim-tree/nvim-tree.lua",
+  dependencies = {"nvim-tree/nvim-web-devicons" },
+  config = function()
+    require("nvim-tree").setup()
+    vim.keymap.set('n', '<leader>fo', ':NvimTreeToggle<cr>')
+  end
+}
+
+local treesitter_spec = {
+  "nvim-treesitter/nvim-treesitter",
+  build = ":TSUpdate",
+  config = function()
+    require("nvim-treesitter.configs").setup({
+      ensure_installed = { "c", "lua", "vim", "vimdoc", "javascript","html", "css", "svelte" },
+      highlight = { enable = true },
+    })
+  end
+}
+
 require("lazy").setup({
-  { -- file tree
-    "nvim-tree/nvim-tree.lua",
-    dependencies = {"nvim-tree/nvim-web-devicons" },
-    config = function()
-      require("nvim-tree").setup()
-      vim.keymap.set('n', '<leader>fo', ':NvimTreeToggle<cr>')
-    end
-  },
-  {
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = { "c", "lua", "vim", "vimdoc", "javascript","html", "css", "svelte" },
-        highlight = { enable = true },
-      })
-    end
-  }
+  nvim_tree_spec,
+  treesitter_spec,
 })
 
 -- idk, needed for nvim-tree
