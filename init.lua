@@ -102,9 +102,45 @@ local treesitter_spec = {
   end
 }
 
+local copilot_spec = {
+  "zbirenbaum/copilot.lua",
+  cmd = "Copilot",
+  event = "InsertEnter",
+  config = function()
+    require("copilot").setup({
+      suggestion = { enabled = false },
+      panel = { enabled = false },
+    })
+  end
+}
+
+local copilot_chat_spec = {
+  "CopilotC-Nvim/CopilotChat.nvim",
+  dependencies = {
+    { "zbirenbaum/copilot.lua" },  
+    { "nvim-lua/plenary.nvim", branch = "master" },   
+  },
+  config = function()
+    require("CopilotChat").setup({
+      debug = false,  -- Set to true if you want to see debug logs
+      show_help = true,  -- Show help text when using CopilotChatInPlace
+      close_on_confirm = false,  -- Close chat window on confirmation
+    })
+
+    -- Set up some convenient keymaps
+    vim.keymap.set("n", "<leader>cc", ":CopilotChat<CR>", { desc = "Open Copilot Chat" })
+    vim.keymap.set("v", "<leader>cc", ":CopilotChatVisual<CR>", { desc = "Open Copilot Chat with visual selection" })
+    vim.keymap.set("n", "<leader>ce", ":CopilotChatExplain<CR>", { desc = "Explain code" })
+    vim.keymap.set("n", "<leader>ct", ":CopilotChatTests<CR>", { desc = "Generate tests" })
+    vim.keymap.set("n", "<leader>cf", ":CopilotChatFix<CR>", { desc = "Fix code" })
+  end,
+}
+
 require("lazy").setup({
   nvim_tree_spec,
   treesitter_spec,
+  copilot_spec,
+  copilot_chat_spec,
 })
 
 -- idk, needed for nvim-tree
