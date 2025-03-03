@@ -27,6 +27,10 @@ vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 
+-- folding
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
+
 -- TODO make the timeout faster
 -- TODO make actual chord if possible??
 -- (problem: typing something ending with h or j and then escaping kills that h or j)
@@ -136,11 +140,46 @@ local copilot_chat_spec = {
   end,
 }
 
+local nvim_neorg_spec = {
+  "nvim-neorg/neorg",
+  lazy = false, -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
+  version = "*", -- Pin Neorg to the latest stable release
+  config = function()
+    require("neorg").setup {
+      load = {
+        ["core.defaults"] = {},
+        ["core.concealer"] = {},
+        ["core.dirman"] = {
+          config = {
+            workspaces = {
+              notes = "~/notes",
+            },
+            default_workspace = "notes",
+          },
+        },
+      },
+    }
+
+    vim.wo.foldlevel = 99
+    vim.wo.conceallevel = 2
+  end,
+}
+
+local colourscheme_spec = {
+  "rebelot/kanagawa.nvim", -- neorg needs a colorscheme with treesitter support
+  config = function()
+    vim.cmd.colorscheme("kanagawa")
+  end,
+}
+
+
 require("lazy").setup({
   nvim_tree_spec,
   treesitter_spec,
   copilot_spec,
   copilot_chat_spec,
+  nvim_neorg_spec,
+  colourscheme_spec,
 })
 
 -- idk, needed for nvim-tree
